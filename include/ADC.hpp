@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#define SAMPLES 64
+
 enum ADC_modes
 {
   ADC_A0,
@@ -29,3 +29,7 @@ void setAnalogMux(ADC_modes mux);
 void ADC_setPrescaler(byte prescl);
 void ADC_setReference(ADC_modes ref);
 void ADC_setADLAR(int nbBit);
+void ADC_freeRunning();
+void ADC_AutoStart();
+void ActivateIntteruptADC();
+void DeactivateIntteruptADC();

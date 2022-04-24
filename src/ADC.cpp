@@ -7,6 +7,34 @@ void ADC_startConvert()
   sei();
 }
 
+void ADC_freeRunning()
+{
+  cli();
+  ADCSRB &= ((0 << ADTS2) | (0 << ADTS1 ) | (0 << ADTS0));
+  sei();
+}
+
+void ADC_AutoStart()
+{
+  cli();
+  ADCSRA |= (1 << ADATE);
+  sei();
+}
+
+void ActivateIntteruptADC()
+{
+  cli();
+  ADCSRA |= (1 << ADIE);
+  sei();
+}
+
+void DeactivateIntteruptADC()
+{
+  cli();
+  ADCSRA &= (0 << ADIE);
+  sei();
+}
+
 unsigned int ADC_read()
 {
   return ADC;
