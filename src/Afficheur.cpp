@@ -38,6 +38,6 @@ void initializeDisplay(Adafruit_SSD1306& display)
   display.fillScreen(BLACK);
   for (byte i = 0; i < (SAMPLES/2); i++) 
   {
-      display.drawFastHLine(i*4 , display.height() - 5, 3, WHITE);
+      display.drawFastHLine(i*4 , display.height() - 1, 3, WHITE);
   }
 }
