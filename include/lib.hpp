@@ -10,6 +10,7 @@
 #define LED1 12
 #define LED2 11
 #define LED3 10
+#define SPEAKER 13
 
 
 

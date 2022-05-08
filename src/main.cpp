@@ -31,6 +31,7 @@ void setup()
   pinMode(LED2, OUTPUT);
   pinMode(LED3,OUTPUT);
   pinMode(A0, INPUT);
+  pinMode(SPEAKER, OUTPUT);
   sei();
   display.display();
   ADC_startConvert();
