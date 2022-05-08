@@ -20,7 +20,7 @@ void setup()
   ADC_AutoStart();
   ActivateIntteruptADC();
   ADC_setADLAR(10);
-  ADC_setPrescaler(32);
+  ADC_setPrescaler(64);
   ADC_setReference(ADC_VCC);
   setAnalogMux(ADC_A0);
   ADC_enable();
@@ -65,7 +65,7 @@ void loop()
         display.fillRect(0, 12, display.width(), display.height() - 13, BLACK);
         for (byte i = 0; i < (SAMPLES/2); i++) {
           //Serial.println(vReal[i]);
-          peak = map(vReal[i], 0, 1023, 0, 52);
+          peak = map(vReal[i], 0, 500, 0, 52);
           display.fillRect(i*4, abs(52 - peak) + 12, 3, peak, WHITE);
         }
         //Serial.println("\n\n\n");
