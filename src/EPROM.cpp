@@ -9,6 +9,8 @@ int t1 = 0;
 int t2 = 0;
 int intervalle = 0;
 int valeurS = 1;
+bool conditionJouer = true;
+
 
 
 void Ecrire() {
@@ -32,23 +34,33 @@ void recuperer()
 
 
 void jouer() {
-  t2 = millis();
-  intervalle = t2 - t1;
-  for(int i = 1; i<taille+1; i++)
+  
+  conditionJouer=true;
+  while(conditionJouer)
   {
-    if(( intervalle > 250*i ) && ( intervalle < 250*(i+1) ))
+    t2 = millis();
+    intervalle = t2 - t1;
+    for(int i = 1; i<taille+1; i++)
     {
-      valeurS =  valeurR[i-1];
+      if(( intervalle > 250*i ) && ( intervalle < 250*(i+1) ))
+      {
+        if(i==taille)
+        {
+          conditionJouer = false;
+        }
+        valeurS =  valeurR[i-1];
+      }
+      
+        digitalWrite(5,HIGH);
+        delayMicroseconds(frequence[valeurS-1]);
+        digitalWrite(5,LOW);
+        delayMicroseconds(frequence[valeurS-1]);
+      
     }
-     
-      digitalWrite(5,HIGH);
-      delayMicroseconds(frequence[valeurS-1]);
-      digitalWrite(5,LOW);
-      delayMicroseconds(frequence[valeurS-1]);
+    if(intervalle > 250*(taille+1))
+    {
+      t1= millis();
+    }
+  }
     
-  }
-  if(intervalle > 250*(taille+1))
-  {
-    t1= millis();
-  }
 }
