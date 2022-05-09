@@ -33,3 +33,4 @@ void ADC_freeRunning();
 void ADC_AutoStart();
 void ActivateIntteruptADC();
 void DeactivateIntteruptADC();
+void ADC_setup();
