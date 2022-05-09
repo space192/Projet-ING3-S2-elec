@@ -6,11 +6,10 @@
 #define SAMPLES 64
 #define FE 30000
 
-#define button 5
+#define button 3
 #define LED1 12
 #define LED2 11
 #define LED3 10
-#define SPEAKER 13
 
 
 

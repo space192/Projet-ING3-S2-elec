@@ -1,5 +1,7 @@
 #include "lib.hpp"
 #include "ADC.hpp"
+#include "EPROM.hpp"
+
 arduinoFFT FFT = arduinoFFT();
 double vReal[SAMPLES];
 double vImag[SAMPLES];
@@ -11,10 +13,15 @@ double average;
 
 
 
+
+
 void setup()
 {
+  //Serial.begin(9600);
+  Ecrire();
+  recuperer();
+  //Serial.begin(9600);
   cli();
-  Serial.begin(9600);
   ADC_disable();
   ADC_freeRunning();
   ADC_AutoStart();
@@ -25,13 +32,13 @@ void setup()
   setAnalogMux(ADC_A0);
   ADC_enable();
   initializeDisplay(display);
-  affichageLED(display);
+  //affichageLED(display);
   pinMode(button,INPUT_PULLUP);
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
   pinMode(LED3,OUTPUT);
   pinMode(A0, INPUT);
-  pinMode(SPEAKER, OUTPUT);
+  pinMode(5, OUTPUT);
   sei();
   display.display();
   ADC_startConvert();
@@ -54,10 +61,16 @@ ISR(ADC_vect)
 
 void loop()
 {
-    //if(!digitalRead(button))
-    //{
+    if(!digitalRead(button))
+    {
+      ADC_disable();
+      jouer();
+      ADC_enable();
+      ADC_startConvert();
+    }
       if(change)
       {
+       
         cli();
         FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
         FFT.Compute(vReal, vImag, SAMPLES, FFT_FORWARD);
@@ -66,7 +79,7 @@ void loop()
         display.fillRect(0, 12, display.width(), display.height() - 13, BLACK);
         for (byte i = 0; i < (SAMPLES/2); i++) {
           //Serial.println(vReal[i]);
-          peak = map(vReal[i], 0, 500, 0, 52);
+          peak = map(vReal[i], 0, 600, 0, 52);
           display.fillRect(i*4, abs(52 - peak) + 12, 3, peak, WHITE);
         }
         //Serial.println("\n\n\n");
