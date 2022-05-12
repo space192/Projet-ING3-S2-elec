@@ -1,3 +1,5 @@
+#ifndef ADC_HPP_INCLUDED
+#define ADC_HPP_INCLUDED
 #include <Arduino.h>
 
 enum ADC_modes
@@ -34,3 +36,4 @@ void ADC_AutoStart();
 void ActivateIntteruptADC();
 void DeactivateIntteruptADC();
 void ADC_setup();
+#endif

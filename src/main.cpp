@@ -1,6 +1,7 @@
 #include "lib.hpp"
 #include "ADC.hpp"
 #include "EPROM.hpp"
+#include "Gaussian.hpp"
 
 arduinoFFT FFT = arduinoFFT();
 double vReal[SAMPLES];
@@ -15,6 +16,8 @@ double vRealTemp2;
 byte compteur =0;
 double dB = 0;
 double power;
+Gaussian tabR[K];
+bool clap = false;
 
 
 
@@ -28,45 +31,25 @@ void setup()
   cli();
   ADC_setup();
   initializeDisplay(display);
-  //affichageLED(display);
-  pinMode(button,INPUT_PULLUP);
+  affichageLED(display, -1);
+  pinMode(button1,INPUT_PULLUP);
+  pinMode(button2,INPUT_PULLUP);
+  pinMode(button3,INPUT_PULLUP);
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
   pinMode(LED3,OUTPUT);
+  pinMode(LED4,OUTPUT);
+  pinMode(LED5,OUTPUT);
+  pinMode(LED6,OUTPUT);
   pinMode(A0, INPUT);
   pinMode(5, OUTPUT);
   sei();
   display.display();
-  
 }
-
-/*ISR(ADC_vect)
-{
-  if(sampleTaken < SAMPLES)
-  {
-    vReal[sampleTaken] = ADC_read() - 322.45;
-    vImag[sampleTaken] = 0.0;
-    vRealTemp = vReal[sampleTaken];
-
-    if(vRealTemp > 363.55)
-    {
-      //Serial.println(vReal[sampleTaken]);
-    }
-    
-    sampleTaken++;
-  }
-  else
-  {
-    sampleTaken = 0;
-
-    //Serial.println("\n\n");
-    change = true;
-  }
-}*/
 
 void loop()
 {
-    if(!digitalRead(button))
+    if(!digitalRead(button2))
     {
       ADC_disable();
       //jouer();
@@ -80,60 +63,93 @@ void loop()
       vReal[i] = ADC_read() - 322.45;
       vImag[i] = 0;
     }
-        compteur = 0;
-        power =0;
-        dB=0;
-        for(int i=0 ; i < SAMPLES ;i++)
-        {
-          power += pow(vReal[i],2);
-          if(vReal[i] > 350.0)
-          {
-            compteur += 1;
-            vRealTemp2 += vReal[i];
-            
-            
-          }
-          
-        }
-        vRealTemp2 = vRealTemp2/compteur;
-        dB = 800*log(vRealTemp2) - 4700;
-        //Serial.println(vRealTemp2);
-        // Serial.print("A");
-         Serial.println(dB);
-        //Serial.println(power);
-        if(dB > 150)
-        {
+    compteur = 0;
+    power =0;
+    dB=0;
+    for(int i=0 ; i < SAMPLES ;i++)
+    {
+      if(i > 2)
+      {
+      power += pow(vReal[i],2);
+      }
+      if(vReal[i] > 350.0)
+      {
+        compteur += 1;
+        vRealTemp2 += vReal[i];
+      }
+    }
+    power /= SAMPLES;
+    vRealTemp2 = vRealTemp2/compteur;
+    dB = 800*log(vRealTemp2) - 4700;
+    //Serial.println(vRealTemp2);
+    // Serial.print("A");
+    //Serial.println(dB);
+    if(dB > 110)
+    {
+      clap = !clap;
+      digitalWrite(LED1,clap);
+      digitalWrite(LED2,clap);
+      digitalWrite(LED3,clap);
+      if(clap)
+      {
+        affichageLED(display,1);
+        affichageLED(display,2);
+        affichageLED(display,3);
+      }
+      else
+      {
+        affichageLED(display, -1);
+      }
+      
+    }
+    FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+    FFT.Compute(vReal, vImag, SAMPLES, FFT_FORWARD);
+    FFT.ComplexToMagnitude(vReal, vImag, SAMPLES);
+    
+    display.fillRect(0, 12, display.width(), display.height() - 13, BLACK);
+    for (byte i = 0; i < (SAMPLES/2); i++) {
+      //Serial.println(vReal[i]);
+      peak = map(vReal[i+2], 0, 600, 0, 52);
+      display.fillRect(i*4, abs(52 - peak) + 12, 3, peak, WHITE);
+      // if(i<10)
+      // {
+      //   Serial.print('9');
+      //   Serial.print(i);
+      //   Serial.println(peak);
+      // }
+      // else{
+      //   Serial.print(i);
+      //   Serial.println(peak);
+      // }
+    }
+    if(!digitalRead(button3))
+    {
+      GMM_ALGORITHM(vReal, tabR);
+      for(byte i = 0 ; i < K ; i++)
+      {
+        Serial.println("u: "+ String(tabR[i].getu()));
+        Serial.println("sigma: "+ String(tabR[i].getsigma()));
+        Serial.println("weight: " + String(tabR[i].getWeight()));
+      }
+      switch(manahattanDistance(tabR))
+      {
+        case 1:
           digitalWrite(LED1,!digitalRead(LED1));
-          digitalWrite(LED2,!digitalRead(LED2));
-          digitalWrite(LED3,!digitalRead(LED3));
-        }
-        FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
-        FFT.Compute(vReal, vImag, SAMPLES, FFT_FORWARD);
-        FFT.ComplexToMagnitude(vReal, vImag, SAMPLES);
-        
-        //display.fillRect(0, 12, display.width(), display.height() - 13, BLACK);
-        for (byte i = 0; i < (SAMPLES/2); i++) {
-          //Serial.println(vReal[i]);
-          peak = map(vReal[i], 0, 600, 0, 52);
-          //display.fillRect(i*4, abs(52 - peak) + 12, 3, peak, WHITE);
-          // if(i<10)
-          // {
-          //   Serial.print('9');
-          //   Serial.print(i);
-          //   Serial.println(peak);
-          // }
-          // else{
-          //   Serial.print(i);
-          //   Serial.println(peak);
-          // }
-        }
-        //Serial.println("\n\n\n");
-        /*average = difference(vReal);
-        if(average >= 0.90)
-        {
-          digitalWrite(LED1, !digitalRead(LED1));
-          delay(500);
-        }*/
-        display.display();
-  //}
+        break;
+        case 2:
+        digitalWrite(LED2,!digitalRead(LED2));
+        break;
+        case 3:
+        digitalWrite(LED3,!digitalRead(LED3));
+        break;
+      }
+    }
+    //Serial.println("\n\n\n");
+    /*average = difference(vReal);
+    if(average >= 0.90)
+    {
+      digitalWrite(LED1, !digitalRead(LED1));
+      delay(500);
+    }*/
+    display.display();
 }
