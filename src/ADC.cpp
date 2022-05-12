@@ -3,9 +3,9 @@
 void ADC_setup()
 {
   ADC_disable();
-  ADC_freeRunning();
-  ADC_AutoStart();
-  ActivateIntteruptADC();
+  //ADC_freeRunning();
+  //ADC_AutoStart();
+  //ActivateIntteruptADC();
   ADC_setADLAR(10);
   ADC_setPrescaler(64);
   ADC_setReference(ADC_VCC);

@@ -6,5 +6,6 @@
                 "italic": true
             }
         }
-    }
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }

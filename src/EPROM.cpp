@@ -40,15 +40,15 @@ void jouer() {
   {
     t2 = millis();
     intervalle = t2 - t1;
-    for(int i = 1; i<taille+1; i++)
+    for(int i = 0; i<taille; i++)
     {
       if(( intervalle > 250*i ) && ( intervalle < 250*(i+1) ))
       {
-        if(i==taille)
+        if(i==taille-1)
         {
           conditionJouer = false;
         }
-        valeurS =  valeurR[i-1];
+        valeurS =  valeurR[i];
       }
       
         digitalWrite(5,HIGH);
@@ -57,10 +57,7 @@ void jouer() {
         delayMicroseconds(frequence[valeurS-1]);
       
     }
-    if(intervalle > 250*(taille+1))
-    {
-      t1= millis();
-    }
+    
   }
     
 }
