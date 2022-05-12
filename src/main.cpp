@@ -131,16 +131,19 @@ void loop()
         Serial.println("sigma: "+ String(tabR[i].getsigma()));
         Serial.println("weight: " + String(tabR[i].getWeight()));
       }
-      switch(manahattanDistance(tabR))
+      switch(BhattacharyyaDistance(tabR))
       {
         case 1:
           digitalWrite(LED1,!digitalRead(LED1));
+          delay(500);
         break;
         case 2:
         digitalWrite(LED2,!digitalRead(LED2));
+        delay(500);
         break;
         case 3:
         digitalWrite(LED3,!digitalRead(LED3));
+        delay(500);
         break;
       }
     }

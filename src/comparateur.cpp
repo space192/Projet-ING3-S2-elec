@@ -15,7 +15,7 @@
     return (xy/sqrt(squaredx*squaredy));
 }*/
 
-byte manahattanDistance(Gaussian *g)
+byte BhattacharyyaDistance(Gaussian *g)
 {
     double Ltemp[K] = {0.0,0.0,0.0};
     double min = 1000;
@@ -24,21 +24,22 @@ byte manahattanDistance(Gaussian *g)
     {
         for(byte j = 0 ; j < K; j++)
         {
-            Ltemp[i] += abs(g[j].getu() - Arthur[i][j].getu()) + abs(g[j].getsigma() - Arthur[i][j].getsigma());
+            //Ltemp[i] += abs(g[j].getu() - Arthur[i][j].getu()) + abs(g[j].getsigma() - Arthur[i][j].getsigma());
+            Ltemp[i] += 1.0/8.0 * pow(g[j].getu() - Arthur[i][j].getu(),2)/((g[j].getsigma() + Arthur[i][j].getsigma())/2.0) + 0.5 * log(((g[j].getsigma() + Arthur[i][j].getsigma())/2.0)/sqrt((g[j].getsigma() * Arthur[i][j].getsigma())/2.0));
         }
     }
     for(byte i = 0 ; i < 2 ; i++)
     {
-        Serial.println(Ltemp[i]);
+        //Serial.println(Ltemp[i]);
         if(Ltemp[i] < min)
         {
             min = Ltemp[i];
             index = i;
         }
     }
-    Serial.println(min);
-    Serial.println(index);
-    if(min < 15)
+    //Serial.println(min);
+    //Serial.println(index);
+    if(min < 0.8)
     {
         return index+1;
     }
