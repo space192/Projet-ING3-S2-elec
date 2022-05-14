@@ -17,6 +17,12 @@ byte compteur = 0;
 unsigned int dB = 0;
 Gaussian tabR[K];
 bool clap = false;
+
+byte oldNote = 0;
+byte newNote = 0;
+bool conditionEnre = false;
+byte sequence[10];
+byte noteEcrite = 0;
 /*double U[K] = {0.0, 0.0, 0.0};
 double S[K] = {0.0, 0.0, 0.0};
 double W[K] = {0.0, 0.0, 0.0};
@@ -53,6 +59,7 @@ void loop()
   {
     // jouer();
   }
+  
   for (byte i = 0; i < SAMPLES; i++)
   {
     ADC_startConvert();
@@ -70,32 +77,17 @@ void loop()
       vRealTemp2 += vReal[i];
     }
   }
-  vRealTemp2 = vRealTemp2 / compteur;
-  dB = (unsigned int)(800 * log(vRealTemp2) - 4700);
+
   // Serial.println(vRealTemp2);
   //  Serial.print("A");
   // Serial.println(dB);
-  if (dB > 110)
-  {
-    clap = !clap;
-    digitalWrite(LED1, clap);
-    digitalWrite(LED2, clap);
-    digitalWrite(LED3, clap);
-    if (clap)
-    {
-      affichageLED(display, 1);
-      affichageLED(display, 2);
-      affichageLED(display, 3);
-    }
-    else
-    {
-      affichageLED(display, -1);
-    }
+    dB = 0;
     vRealTemp2 = vRealTemp2/compteur;
-    dB = 800*log(vRealTemp2) - 4700;
+    dB = (800*log(vRealTemp2) - 4700)*1U;
     //Serial.println(vRealTemp2);
     Serial.print("A");
     Serial.println(dB);
+
     if(dB > 110)
     {
       clap = !clap;
@@ -121,10 +113,10 @@ void loop()
     FFT.ComplexToMagnitude(vReal, vImag, SAMPLES);
     
     display.fillRect(0, 12, display.width(), display.height() - 13, BLACK);
-    for (byte i = 4; i < (SAMPLES/2); i++) {
+    for (byte i = 2; i < (SAMPLES/2); i++) {
       //Serial.println(vReal[i]);
       peak = map(vReal[i-2], 0, 600, 0, 52);
-      display.fillRect(i*2, abs(52 - peak) + 12, 3, peak, WHITE);
+      display.fillRect(i*4, abs(52 - peak) + 12, 3, peak, WHITE);
       if(i<10)
       {
         Serial.print('9');
@@ -161,11 +153,40 @@ void loop()
         break;
       }
     }
-    if(dB > 110)
+    if(dB > 100)
     {
-      dB = 110;
+      dB = 100;
     }
+    if(dB < 31)
+    {
+      dB = 31;
+    }
+    
     display.drawRect(0, display.height() - (dB -30)/4.4, 8, (dB -30)/4.4, WHITE);
+
+    if (!digitalRead(button1))
+    {
+      conditionEnre = true;
+    }
+
+    if(conditionEnre)
+    {
+      if(newNote != oldNote)
+      {
+        sequence[noteEcrite] = newNote;
+        oldNote = newNote;
+        noteEcrite ++;
+        if(noteEcrite == 10)
+        {
+            Ecrire(newNote, noteEcrite);
+            conditionEnre = false;
+            noteEcrite = 0;
+        }
+      }
+
+
+    }
+
     //Serial.println("\n\n\n");
     /*average = difference(vReal);
     if(average >= 0.90)

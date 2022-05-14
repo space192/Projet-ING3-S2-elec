@@ -42,7 +42,7 @@ void initializeDisplay(Adafruit_SSD1306& display)
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display.clearDisplay();
   display.fillScreen(BLACK);
-  for (byte i =0 ; i < (SAMPLES/2); i++) 
+  for (byte i =2 ; i < (SAMPLES/2); i++) 
   {
       display.drawFastHLine(i*4 , display.height() - 1, 3, WHITE);
   }
