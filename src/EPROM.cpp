@@ -13,13 +13,10 @@ bool conditionJouer = true;
 
 
 
-void Ecrire() {
-  int valeurE[10] = {1,2,3,1,1,2,3,3,4,5};
+void Ecrire(byte valeurE, byte index) {
   EEPROM.update(adresse[0], 10);
-  for(int i = 0; i<10; i++)
-  {
-    EEPROM.update(adresse[i+1], valeurE[i]);
-  }
+  
+  EEPROM.update(adresse[index+1], valeurE);
   
 }
 
