@@ -127,7 +127,7 @@ void findMaximums(double *t, uint8_t *tab2, int k)
 
 double GaussianCalculus(Gaussian gauss, double x)
 {
-    return (double)(gauss.getWeight() * ((1 / (sqrt(2.0 * PI * gauss.getsigma()))) * exp(-0.5 * pow((x - gauss.getu()), 2) / gauss.getsigma())));
+    return (double)(gauss.getWeight() * ((1 / (sqrt(2.0 * PI * gauss.getsigma()))) * exp(-0.5 * ((x - gauss.getu()*(x - gauss.getu()) / gauss.getsigma())));
 }
 
 double TGaussianCalculus(Gaussian gaussT[], Gaussian gauss, double x)
@@ -165,7 +165,7 @@ void GMM_ALGORITHM(double tab[SAMPLES], Gaussian Gresult[K])
         {
             for (byte j = 0; j < K; j++)
             {
-                result += sqrt(tab[i+2]) * TGaussianCalculus(tabG, tabG[j], i+2) * (log(tabG[j].getWeight()) - 0.5 * log(tabG[j].getsigma()) - 0.5 * (pow(i+2 - tabG[j].getu(), 2) / tabG[j].getsigma()) - 0.5 * log(2 * PI));
+                result += sqrt(tab[i+2]) * TGaussianCalculus(tabG, tabG[j], i+2) * (log(tabG[j].getWeight()) - 0.5 * log(tabG[j].getsigma()) - 0.5 * (((i+2 - tabG[j].getu())*(i+2 - tabG[j].getu())) / tabG[j].getsigma()) - 0.5 * log(2 * PI));
             }
         }
         for (byte j = 0; j < K; j++)
@@ -179,7 +179,7 @@ void GMM_ALGORITHM(double tab[SAMPLES], Gaussian Gresult[K])
                 tempG = sqrt(tab[i+2]) * TGaussianCalculus(tabG, tabG[j], i+2);
                 sumGaussian += tempG;
                 resultU += tempG * i+2;
-                resultsigma += tempG * pow((i+2 - tabG[j].getu()), 2);
+                resultsigma += tempG * (i+2 - tabG[j].getu()) * (i+2 - tabG[j].getu());
                 count += sqrt(tab[i+2]);
             }
             tabG[j].setu(resultU / sumGaussian);

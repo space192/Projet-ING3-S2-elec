@@ -91,7 +91,6 @@ void loop()
     {
       affichageLED(display, -1);
     }
-    power /= SAMPLES;
     vRealTemp2 = vRealTemp2/compteur;
     dB = 800*log(vRealTemp2) - 4700;
     //Serial.println(vRealTemp2);
