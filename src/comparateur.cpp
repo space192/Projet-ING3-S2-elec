@@ -15,31 +15,73 @@
     return (xy/sqrt(squaredx*squaredy));
 }*/
 
-byte BhattacharyyaDistance(Gaussian *g)
+byte KullbackLeiblerDivergence(Gaussian *g)
 {
-    double Ltemp[K] = {0.0,0.0,0.0};
+    double Ltemp[SON];
+    for(byte i = 0 ; i < SON ;i++)
+    {
+        Ltemp[i] = 0.0;
+    }
     double min = 1000;
     byte index;
-    for(byte i = 0 ; i < 2 ;i++)
+    for(byte i = 0 ; i < SON ; i++)
     {
-        for(byte j = 0 ; j < K; j++)
+        for(byte j = 0 ; j < K ; j++)
         {
-            //Ltemp[i] += abs(g[j].getu() - Arthur[i][j].getu()) + abs(g[j].getsigma() - Arthur[i][j].getsigma());
-            Ltemp[i] += 1.0/8.0 * pow(g[j].getu() - Arthur[i][j].getu(),2)/((g[j].getsigma() + Arthur[i][j].getsigma())/2.0) + 0.5 * log(((g[j].getsigma() + Arthur[i][j].getsigma())/2.0)/sqrt((g[j].getsigma() * Arthur[i][j].getsigma())/2.0));
+            for(byte k = 0 ; k < SAMPLES/2;k+=2)
+            {
+                Ltemp[i] += GaussianCalculus(g[j],k) * log(GaussianCalculus(g[j],k)/((GaussianCalculus(Arthur[i][j],k)+ 0.00001)));
+            }
         }
     }
-    for(byte i = 0 ; i < 2 ; i++)
+    for(byte i = 0 ; i < SON ; i++)
     {
-        //Serial.println(Ltemp[i]);
+        Serial.println(Ltemp[i]);
         if(Ltemp[i] < min)
         {
             min = Ltemp[i];
             index = i;
         }
     }
-    //Serial.println(min);
-    //Serial.println(index);
-    if(min < 0.8)
+    Serial.println("\n");
+    Serial.println(min);
+    Serial.println(index);
+    if(min < SEUIL)
+    {
+        return index+1;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+
+byte BhattacharyyaDistance(Gaussian *g)
+{
+    double Ltemp[SON];
+    for(byte i = 0 ; i < SON ; i++)
+    {
+        Ltemp[i] = 0.0;
+    }
+    double min = 1000;
+    byte index;
+    for(byte i = 0 ; i < SON ;i++)
+    {
+        for(byte j = 0 ; j < K; j++)
+        {
+            Ltemp[i] += g[j].getWeight() * Arthur[i][j].getWeight() * 1.0/8.0 * pow(g[j].getu() - Arthur[i][j].getu(),2)/((g[j].getsigma() + Arthur[i][j].getsigma())/2.0) + 0.5 * log(((g[j].getsigma() + Arthur[i][j].getsigma())/2.0)/sqrt((g[j].getsigma() * Arthur[i][j].getsigma())));
+        }
+    }
+    for(byte i = 0 ; i < SON ; i++)
+    {
+        if(Ltemp[i] < min)
+        {
+            min = Ltemp[i];
+            index = i;
+        }
+    }
+    if(min < SEUIL)
     {
         return index+1;
     }
@@ -115,7 +157,7 @@ void GMM_ALGORITHM(double tab[SAMPLES], Gaussian Gresult[K])
     resultsigma = 0.0;
     sumGaussian = 0.0;
     count = 0;
-    for(byte l = 0 ; l < 2;l++)
+    for(byte l = 0 ; l < GMM;l++)
     {
         result = 0.0;
         tempG = 0.0;

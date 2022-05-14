@@ -24,7 +24,8 @@ private:
   double weight;
 };
 
-byte BhattacharyyaDistance(Gaussian *g);
+//byte BhattacharyyaDistance(Gaussian *g);
+byte KullbackLeiblerDivergence(Gaussian *g);
 void findMaximums(double *t, uint8_t *tab2, int k);
 double GaussianCalculus(Gaussian gauss, double x);
 double TGaussianCalculus(Gaussian gaussT[], Gaussian gauss, double x);

@@ -13,34 +13,34 @@ double average;
 String temp;
 double vRealTemp;
 double vRealTemp2;
-byte compteur =0;
-double dB = 0;
-double power;
+byte compteur = 0;
+unsigned int dB = 0;
 Gaussian tabR[K];
 bool clap = false;
-
-
-
+/*double U[K] = {0.0, 0.0, 0.0};
+double S[K] = {0.0, 0.0, 0.0};
+double W[K] = {0.0, 0.0, 0.0};
+int counterU = 0;*/
 
 void setup()
 {
   Serial.begin(115200);
-  //Ecrire();
-  //recuperer();
-  //Serial.begin(9600);
+  // Ecrire();
+  // recuperer();
+  // Serial.begin(9600);
   cli();
   ADC_setup();
   initializeDisplay(display);
   affichageLED(display, -1);
-  pinMode(button1,INPUT_PULLUP);
-  pinMode(button2,INPUT_PULLUP);
-  pinMode(button3,INPUT_PULLUP);
+  pinMode(button1, INPUT_PULLUP);
+  pinMode(button2, INPUT_PULLUP);
+  pinMode(button3, INPUT_PULLUP);
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
-  pinMode(LED3,OUTPUT);
-  pinMode(LED4,OUTPUT);
-  pinMode(LED5,OUTPUT);
-  pinMode(LED6,OUTPUT);
+  pinMode(LED3, OUTPUT);
+  pinMode(LED4, OUTPUT);
+  pinMode(LED5, OUTPUT);
+  pinMode(LED6, OUTPUT);
   pinMode(A0, INPUT);
   pinMode(5, OUTPUT);
   sei();
@@ -49,110 +49,131 @@ void setup()
 
 void loop()
 {
-    if(!digitalRead(button2))
+  if (!digitalRead(button2))
+  {
+    // jouer();
+  }
+  for (byte i = 0; i < SAMPLES; i++)
+  {
+    ADC_startConvert();
+    while (!ADC_available());
+    vReal[i] = ADC_read() - 322.45;
+    vImag[i] = 0;
+  }
+  compteur = 0;
+  dB = 0;
+  for (int i = 0; i < SAMPLES; i++)
+  {
+    if (vReal[i] > 350.0)
     {
-      ADC_disable();
-      //jouer();
-      ADC_setup();
-      ADC_startConvert();
+      compteur += 1;
+      vRealTemp2 += vReal[i];
     }
-    for(byte i = 0 ; i <SAMPLES ;i++)
+  }
+  vRealTemp2 = vRealTemp2 / compteur;
+  dB = (unsigned int)(800 * log(vRealTemp2) - 4700);
+  // Serial.println(vRealTemp2);
+  //  Serial.print("A");
+  // Serial.println(dB);
+  if (dB > 110)
+  {
+    clap = !clap;
+    digitalWrite(LED1, clap);
+    digitalWrite(LED2, clap);
+    digitalWrite(LED3, clap);
+    if (clap)
     {
-      ADC_startConvert();
-      while(!ADC_available());
-      vReal[i] = ADC_read() - 322.45;
-      vImag[i] = 0;
+      affichageLED(display, 1);
+      affichageLED(display, 2);
+      affichageLED(display, 3);
     }
-    compteur = 0;
-    power =0;
-    dB=0;
-    for(int i=0 ; i < SAMPLES ;i++)
+    else
     {
-      if(i > 2)
-      {
-      power += pow(vReal[i],2);
-      }
-      if(vReal[i] > 350.0)
-      {
-        compteur += 1;
-        vRealTemp2 += vReal[i];
-      }
+      affichageLED(display, -1);
     }
-    power /= SAMPLES;
-    vRealTemp2 = vRealTemp2/compteur;
-    dB = 800*log(vRealTemp2) - 4700;
-    //Serial.println(vRealTemp2);
-    // Serial.print("A");
-    //Serial.println(dB);
-    if(dB > 110)
+  }
+  FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+  FFT.Compute(vReal, vImag, SAMPLES, FFT_FORWARD);
+  FFT.ComplexToMagnitude(vReal, vImag, SAMPLES);
+
+  display.fillRect(0, 12, display.width(), display.height() - 13, BLACK);
+  for (byte i = 0; i < (SAMPLES / 2); i++)
+  {
+    // Serial.println(vReal[i]);
+    peak = map(vReal[i + 2], 0, 600, 0, 52);
+    display.fillRect(i * 4, abs(52 - peak) + 12, 3, peak, WHITE);
+    // if(i<10)
+    // {
+    //   Serial.print('9');
+    //   Serial.print(i);
+    //   Serial.println(peak);
+    // }
+    // else{
+    //   Serial.print(i);
+    //   Serial.println(peak);
+    // }
+  }
+  //if (!digitalRead(button3))
+  //{
+    GMM_ALGORITHM(vReal, tabR);
+    /*for (byte i = 0; i < K; i++)
     {
-      clap = !clap;
-      digitalWrite(LED1,clap);
-      digitalWrite(LED2,clap);
-      digitalWrite(LED3,clap);
-      if(clap)
-      {
-        affichageLED(display,1);
-        affichageLED(display,2);
-        affichageLED(display,3);
-      }
-      else
-      {
-        affichageLED(display, -1);
-      }
-      
+      U[i] += tabR[i].getu();
+      S[i] += tabR[i].getsigma();
+      W[i] += tabR[i].getWeight();
+      // Serial.println("u: "+ String(tabR[i].getu()));
+      // Serial.println("sigma: "+ String(tabR[i].getsigma()));
+      // Serial.println("weight: " + String(tabR[i].getWeight()));
     }
-    FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
-    FFT.Compute(vReal, vImag, SAMPLES, FFT_FORWARD);
-    FFT.ComplexToMagnitude(vReal, vImag, SAMPLES);
-    
-    display.fillRect(0, 12, display.width(), display.height() - 13, BLACK);
-    for (byte i = 0; i < (SAMPLES/2); i++) {
-      //Serial.println(vReal[i]);
-      peak = map(vReal[i+2], 0, 600, 0, 52);
-      display.fillRect(i*4, abs(52 - peak) + 12, 3, peak, WHITE);
-      // if(i<10)
-      // {
-      //   Serial.print('9');
-      //   Serial.print(i);
-      //   Serial.println(peak);
-      // }
-      // else{
-      //   Serial.print(i);
-      //   Serial.println(peak);
-      // }
-    }
-    if(!digitalRead(button3))
+    counterU++;*/
+    switch(KullbackLeiblerDivergence(tabR))
     {
-      GMM_ALGORITHM(vReal, tabR);
-      for(byte i = 0 ; i < K ; i++)
-      {
-        Serial.println("u: "+ String(tabR[i].getu()));
-        Serial.println("sigma: "+ String(tabR[i].getsigma()));
-        Serial.println("weight: " + String(tabR[i].getWeight()));
-      }
-      switch(BhattacharyyaDistance(tabR))
-      {
-        case 1:
-          digitalWrite(LED1,!digitalRead(LED1));
-          delay(500);
-        break;
-        case 2:
-        digitalWrite(LED2,!digitalRead(LED2));
+      case 1: //1
+        Serial.println("1");
+        //digitalWrite(LED1,!digitalRead(LED1));
         delay(500);
-        break;
-        case 3:
-        digitalWrite(LED3,!digitalRead(LED3));
-        delay(500);
-        break;
-      }
-    }
-    //Serial.println("\n\n\n");
-    /*average = difference(vReal);
-    if(average >= 0.90)
-    {
-      digitalWrite(LED1, !digitalRead(LED1));
+      break;
+      case 2: //2
+      Serial.println("2");
+      //digitalWrite(LED2,!digitalRead(LED2));
       delay(500);
-    }*/
-    display.display();
+      break;
+      Serial.println("3");
+      case 3: //3
+      //digitalWrite(LED3,!digitalRead(LED3));
+      delay(500);
+      break;
+      case 4: //re
+      Serial.println("4");
+      delay(500);
+      break;
+    }
+  //}
+  /*else
+  {
+    if (counterU != 0)
+    {
+      for (byte i = 0; i < K; i++)
+      {
+        Serial.println(U[i] / (double)counterU);
+        Serial.println(S[i] / (double)counterU);
+        Serial.println(W[i] / (double)counterU);
+      }
+    }
+    counterU = 0;
+    for(byte i = 0 ; i < K ; i++)
+    {
+      U[i] = 0.0;
+      S[i] = 0.0;
+      W[i] = 0.0;
+    }
+  }*/
+  // Serial.println("\n\n\n");
+  /*average = difference(vReal);
+  if(average >= 0.90)
+  {
+    digitalWrite(LED1, !digitalRead(LED1));
+    delay(500);
+  }*/
+  display.display();
 }

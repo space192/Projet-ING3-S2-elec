@@ -7,6 +7,9 @@
 #include <Adafruit_SSD1306.h>
 #define SAMPLES 64
 #define K 3
+#define GMM 2
+#define SEUIL 0.1
+#define SON 4
 
 #define button1 4
 #define button2 3
@@ -22,5 +25,5 @@
 
 void affichageLED(Adafruit_SSD1306& display, byte selected);
 void initializeDisplay(Adafruit_SSD1306& display);
-double difference(double samples[SAMPLES]);
+//double difference(double samples[SAMPLES]);
 #endif
