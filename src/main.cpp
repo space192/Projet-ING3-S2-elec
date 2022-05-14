@@ -82,14 +82,15 @@ void loop()
     vRealTemp2 = vRealTemp2/compteur;
     dB = 800*log(vRealTemp2) - 4700;
     //Serial.println(vRealTemp2);
-    // Serial.print("A");
-    //Serial.println(dB);
+    Serial.print("A");
+    Serial.println(dB);
     if(dB > 110)
     {
       clap = !clap;
       digitalWrite(LED1,clap);
       digitalWrite(LED2,clap);
       digitalWrite(LED3,clap);
+      
       if(clap)
       {
         affichageLED(display,1);
@@ -98,38 +99,39 @@ void loop()
       }
       else
       {
-        affichageLED(display, -1);
+        affichageLED(display, 7);
       }
       
     }
+    
     FFT.Windowing(vReal, SAMPLES, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
     FFT.Compute(vReal, vImag, SAMPLES, FFT_FORWARD);
     FFT.ComplexToMagnitude(vReal, vImag, SAMPLES);
     
     display.fillRect(0, 12, display.width(), display.height() - 13, BLACK);
-    for (byte i = 0; i < (SAMPLES/2); i++) {
+    for (byte i = 4; i < (SAMPLES/2); i++) {
       //Serial.println(vReal[i]);
-      peak = map(vReal[i+2], 0, 600, 0, 52);
-      display.fillRect(i*4, abs(52 - peak) + 12, 3, peak, WHITE);
-      // if(i<10)
-      // {
-      //   Serial.print('9');
-      //   Serial.print(i);
-      //   Serial.println(peak);
-      // }
-      // else{
-      //   Serial.print(i);
-      //   Serial.println(peak);
-      // }
+      peak = map(vReal[i-2], 0, 600, 0, 52);
+      display.fillRect(i*2, abs(52 - peak) + 12, 3, peak, WHITE);
+      if(i<10)
+      {
+        Serial.print('9');
+        Serial.print(i);
+        Serial.println(peak);
+      }
+      else{
+        Serial.print(i);
+        Serial.println(peak);
+      }
     }
     if(!digitalRead(button3))
     {
       GMM_ALGORITHM(vReal, tabR);
       for(byte i = 0 ; i < K ; i++)
       {
-        Serial.println("u: "+ String(tabR[i].getu()));
-        Serial.println("sigma: "+ String(tabR[i].getsigma()));
-        Serial.println("weight: " + String(tabR[i].getWeight()));
+        Serial.println("u"+ String(tabR[i].getu()));
+        Serial.println("s"+ String(tabR[i].getsigma()));
+        Serial.println("w" + String(tabR[i].getWeight()));
       }
       switch(BhattacharyyaDistance(tabR))
       {
@@ -147,6 +149,11 @@ void loop()
         break;
       }
     }
+    if(dB > 110)
+    {
+      dB = 110;
+    }
+    display.drawRect(0, display.height() - (dB -30)/4.4, 8, (dB -30)/4.4, WHITE);
     //Serial.println("\n\n\n");
     /*average = difference(vReal);
     if(average >= 0.90)

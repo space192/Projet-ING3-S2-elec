@@ -9,7 +9,7 @@ void affichageLED(Adafruit_SSD1306& display, byte selected) //envoie un chiffre 
     {
         for(byte i =j-1 ; i < 3 + j-1 ; i++)
         {
-            if(selected == -1)
+            if(selected == 7)
             {
                 display.writeFillRect(i*20+5 + (j-1)*40,1, 15,7, BLACK);
                 display.drawRoundRect(i*20+5 + (j-1)*40,1, 15,7,2, WHITE);
@@ -17,6 +17,8 @@ void affichageLED(Adafruit_SSD1306& display, byte selected) //envoie un chiffre 
                 {
                     display.drawFastVLine(i*20+10 + (j-1)*40 + 2-k, 3, 3, WHITE);
                 }
+                // display.writeFillRect(i*20+5 + (j-1)*40,1, 15,7, BLACK);
+                // display.drawFastVLine(i*20+10 + (j-1)*40, 3, 3, WHITE);
             }
             else if(selected == ((i+1) + (j-1)*(j)))
             {
@@ -40,8 +42,14 @@ void initializeDisplay(Adafruit_SSD1306& display)
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display.clearDisplay();
   display.fillScreen(BLACK);
-  for (byte i = 0; i < (SAMPLES/2); i++) 
+  for (byte i =0 ; i < (SAMPLES/2); i++) 
   {
       display.drawFastHLine(i*4 , display.height() - 1, 3, WHITE);
   }
+  
+}
+
+void affichageDb(Adafruit_SSD1306& display)
+{
+
 }
