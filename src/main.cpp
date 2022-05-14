@@ -146,7 +146,7 @@ void loop()
         Serial.println("s"+ String(tabR[i].getsigma()));
         Serial.println("w" + String(tabR[i].getWeight()));
       }
-      switch(BhattacharyyaDistance(tabR))
+      switch(KullbackLeiblerDivergence(tabR))
       {
         case 1:
           digitalWrite(LED1,!digitalRead(LED1));
