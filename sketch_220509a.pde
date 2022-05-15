@@ -22,7 +22,7 @@ int selectG = 3;
 
 void setup() 
 {
-  size(500,500); 
+  size(500,520); 
   String portName = Serial.list()[0]; //change the 0 to a 1 or 2 etc. to match your port
   myPort = new Serial(this, portName, 115200);
   while(myPort.available() <0);
@@ -119,18 +119,17 @@ void draw() {
       {
         
       
-      textSize(20);
+      textSize(15);
       
       
-       fill(200,0,0);
-      
-      
+      fill(200,0,0);
       rect(20,60,3*db - 30,20);
       text(db + "dB",3*db ,80);
       
         
       for(int i=0; i< samples/2; i++)
       {
+        text(437.5*(i+1),i*15 + 5 ,510 );
         rect(i*15 + 5, abs(500 - (peak[i]*3)) , 10, (peak[i]*3));
       }
       }
