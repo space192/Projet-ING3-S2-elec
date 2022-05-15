@@ -13,8 +13,8 @@
 
 
 
-#define button1 4
-#define button2 3
+#define button1 3
+#define button2 4
 #define button3 2
 #define LED1 9
 #define LED2 8
