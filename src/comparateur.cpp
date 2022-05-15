@@ -37,16 +37,16 @@ byte KullbackLeiblerDivergence(Gaussian *g)
     }
     for(byte i = 0 ; i < SON ; i++)
     {
-        Serial.println(abs(Ltemp[i]));
+        // Serial.println(abs(Ltemp[i]));
         if(abs(Ltemp[i]) < min)
         {
             min = abs(Ltemp[i]);
             index = i;
         }
     }
-    Serial.println("\n");
-    Serial.println(min);
-    Serial.println(index+1);
+    // Serial.println("\n");
+    // Serial.println(min);
+    // Serial.println(index+1);
     if(min < SEUIL)
     {
         return index+1;
