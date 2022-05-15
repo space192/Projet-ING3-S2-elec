@@ -7,9 +7,11 @@
 #include <Adafruit_SSD1306.h>
 #define SAMPLES 64
 #define K 3
-#define GMM 2
-#define SEUIL 0.1
-#define SON 4
+#define GMM 5
+#define SEUIL 0.2
+#define SON 3
+
+
 
 #define button1 4
 #define button2 3
@@ -20,7 +22,6 @@
 #define LED4 12
 #define LED5 11
 #define LED6 10
-
 
 
 void affichageLED(Adafruit_SSD1306& display, byte selected);

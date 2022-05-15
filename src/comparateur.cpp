@@ -1,6 +1,7 @@
 #include "lib.hpp"
 #include "Gaussian.hpp"
 #include "const.hpp"
+
 /*double difference(double samples[SAMPLES])
 {
     double squaredx = 0.0;
@@ -28,27 +29,27 @@ byte KullbackLeiblerDivergence(Gaussian *g)
     {
         for(byte j = 0 ; j < K ; j++)
         {
-            for(byte k = 0 ; k < SAMPLES/2;k+=2)
+            for(byte k = 0 ; k < SAMPLES/2;k++)
             {
-                Ltemp[i] += GaussianCalculus(g[j],k) * log(GaussianCalculus(g[j],k)/((GaussianCalculus(Arthur[i][j],k)+ 0.00001)));
+                Ltemp[i] += GaussianCalculus(g[j],k) * log(GaussianCalculus(g[j],k)/((GaussianCalculus(Arthur[i][j],k)+ 0.0001)));
             }
         }
     }
     for(byte i = 0 ; i < SON ; i++)
     {
-        Serial.println(Ltemp[i]);
-        if(Ltemp[i] < min)
+        Serial.println(abs(Ltemp[i]));
+        if(abs(Ltemp[i]) < min)
         {
-            min = Ltemp[i];
+            min = abs(Ltemp[i]);
             index = i;
         }
     }
     Serial.println("\n");
-    Serial.println(min);
+    Serial.println(Ltemp[index]);
     Serial.println(index);
     if(min < SEUIL)
     {
-        return index+1;
+        return index;
     }
     else
     {
@@ -57,7 +58,7 @@ byte KullbackLeiblerDivergence(Gaussian *g)
 }
 
 
-byte BhattacharyyaDistance(Gaussian *g)
+/*byte BhattacharyyaDistance(Gaussian *g)
 {
     double Ltemp[SON];
     for(byte i = 0 ; i < SON ; i++)
@@ -89,7 +90,7 @@ byte BhattacharyyaDistance(Gaussian *g)
     {
         return -1;
     }
-}
+}*/
 
 
 double resultU = 0.0;
@@ -127,7 +128,7 @@ void findMaximums(double *t, uint8_t *tab2, int k)
 
 double GaussianCalculus(Gaussian gauss, double x)
 {
-    return (double)(gauss.getWeight() * ((1 / (sqrt(2.0 * PI * gauss.getsigma()))) * exp(-0.5 * ((x - gauss.getu()*(x - gauss.getu()) / gauss.getsigma())));
+    return (double)(gauss.getWeight() * ((1 / (sqrt(2.0 * PI * gauss.getsigma()))) * exp(-0.5 * pow((x - gauss.getu()), 2) / gauss.getsigma())));
 }
 
 double TGaussianCalculus(Gaussian gaussT[], Gaussian gauss, double x)
@@ -165,7 +166,7 @@ void GMM_ALGORITHM(double tab[SAMPLES], Gaussian Gresult[K])
         {
             for (byte j = 0; j < K; j++)
             {
-                result += sqrt(tab[i+2]) * TGaussianCalculus(tabG, tabG[j], i+2) * (log(tabG[j].getWeight()) - 0.5 * log(tabG[j].getsigma()) - 0.5 * (((i+2 - tabG[j].getu())*(i+2 - tabG[j].getu())) / tabG[j].getsigma()) - 0.5 * log(2 * PI));
+                result += tab[i] * TGaussianCalculus(tabG, tabG[j], i+2) * (log(tabG[j].getWeight()) - 0.5 * log(tabG[j].getsigma()) - 0.5 * (pow(i+2 - tabG[j].getu(), 2) / tabG[j].getsigma()) - 0.5 * log(2 * PI));
             }
         }
         for (byte j = 0; j < K; j++)
@@ -176,11 +177,11 @@ void GMM_ALGORITHM(double tab[SAMPLES], Gaussian Gresult[K])
             count = 0;
             for (byte i = 0; i < SAMPLES / 2; i++)
             {
-                tempG = sqrt(tab[i+2]) * TGaussianCalculus(tabG, tabG[j], i+2);
+                tempG = tab[i+2] * TGaussianCalculus(tabG, tabG[j], i);
                 sumGaussian += tempG;
-                resultU += tempG * i+2;
-                resultsigma += tempG * (i+2 - tabG[j].getu()) * (i+2 - tabG[j].getu());
-                count += sqrt(tab[i+2]);
+                resultU += tempG * (i+2);
+                resultsigma += tempG * pow((i+2 - tabG[j].getu()), 2);
+                count += tab[i+2];
             }
             tabG[j].setu(resultU / sumGaussian);
             tabG[j].setweight(sumGaussian / count);
