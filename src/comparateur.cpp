@@ -45,11 +45,11 @@ byte KullbackLeiblerDivergence(Gaussian *g)
         }
     }
     Serial.println("\n");
-    Serial.println(Ltemp[index]);
-    Serial.println(index);
+    Serial.println(min);
+    Serial.println(index+1);
     if(min < SEUIL)
     {
-        return index;
+        return index+1;
     }
     else
     {
@@ -177,7 +177,7 @@ void GMM_ALGORITHM(double tab[SAMPLES], Gaussian Gresult[K])
             count = 0;
             for (byte i = 0; i < SAMPLES / 2; i++)
             {
-                tempG = tab[i+2] * TGaussianCalculus(tabG, tabG[j], i);
+                tempG = tab[i+2] * TGaussianCalculus(tabG, tabG[j], i+2);
                 sumGaussian += tempG;
                 resultU += tempG * (i+2);
                 resultsigma += tempG * pow((i+2 - tabG[j].getu()), 2);

@@ -17,12 +17,14 @@ float[] mu = new float[3];
 float[] sigma = new float[3];
 float[] weight = new float[3];
 int selectG = 3;
+int condition =1;
+boolean firstContact = false;
 
 
 
 void setup() 
 {
-  size(500,500); 
+  size(500,520); 
   String portName = Serial.list()[0]; //change the 0 to a 1 or 2 etc. to match your port
   myPort = new Serial(this, portName, 115200);
   while(myPort.available() <0);
@@ -44,6 +46,7 @@ void draw() {
           db = Float.valueOf(val.substring(1));
           
         }
+        condition  =0;
       }
       else if(val.charAt(0) == 'u')
       {
@@ -107,19 +110,20 @@ void draw() {
       fill(255,255,255);
       rect(0,0,1000,700);
       
-      if(val.length() > 3)
+      if((val.length() > 3) && (condition  == 1) && !(val.contains("A")))
       {
         if(val.substring(2) != null)
         {
           peak[index] = Float.valueOf(val.substring(2));
         }
       }
+      condition = 1;
       
       if(conditionG == 0)
       {
         
       
-      textSize(20);
+      textSize(10);
       
       
        fill(200,0,0);
@@ -127,10 +131,11 @@ void draw() {
       
       rect(20,60,3*db - 30,20);
       text(db + "dB",3*db ,80);
-      
+      text("HZ", 475, 510);
         
       for(int i=0; i< samples/2; i++)
       {
+        
         rect(i*15 + 5, abs(500 - (peak[i]*3)) , 10, (peak[i]*3));
       }
       }

@@ -8,7 +8,7 @@
 #define SAMPLES 64
 #define K 3
 #define GMM 5
-#define SEUIL 0.2
+#define SEUIL 0.7
 #define SON 3
 
 
