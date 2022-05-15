@@ -83,6 +83,10 @@ void loop()
   // Serial.println(dB);
     dB = 0;
     vRealTemp2 = vRealTemp2/compteur;
+    if(vRealTemp2 > 450)
+    {
+      vRealTemp2 = 450;
+    }
     dB = (800*log(vRealTemp2) - 4700)*1U;
     //Serial.println(vRealTemp2);
     Serial.print("A");
